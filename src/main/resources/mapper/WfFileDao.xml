@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="wang.flybird.dao.WfFileDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="wang.flybird.entity.WfFileEntity" id="wfFileMap">
+        <result property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="fid" column="fid"/>
+        <result property="fname" column="fname"/>
+        <result property="fsize" column="fsize"/>
+        <result property="uptime" column="uptime"/>
+        <result property="delflag" column="delflag"/>
+    </resultMap>
+
+	<select id="queryObject" resultType="wang.flybird.entity.WfFileEntity">
+		select * from wf_file where id = #{value}
+	</select>
+
+	<select id="queryList" resultType="wang.flybird.entity.WfFileEntity">
+		select * from wf_file
+        <choose>
+            <when test="sidx != null and sidx.trim() != ''">
+                order by ${sidx} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="queryTotal" resultType="int">
+		select count(*) from wf_file 
+	</select>
+	 
+	<insert id="save" parameterType="wang.flybird.entity.WfFileEntity">
+		insert into wf_file
+		(
+			`id`, 
+			`username`, 
+			`fid`, 
+			`fname`, 
+			`fsize`, 
+			`uptime`, 
+			`delflag`
+		)
+		values
+		(
+			#{id}, 
+			#{username}, 
+			#{fid}, 
+			#{fname}, 
+			#{fsize}, 
+			#{uptime}, 
+			#{delflag}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="wang.flybird.entity.WfFileEntity">
+		update wf_file 
+		<set>
+			<if test="username != null">`username` = #{username}, </if>
+			<if test="fid != null">`fid` = #{fid}, </if>
+			<if test="fname != null">`fname` = #{fname}, </if>
+			<if test="fsize != null">`fsize` = #{fsize}, </if>
+			<if test="uptime != null">`uptime` = #{uptime}, </if>
+			<if test="delflag != null">`delflag` = #{delflag}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="delete">
+		delete from wf_file where id = #{value}
+	</delete>
+	
+	<delete id="deleteBatch">
+		delete from wf_file where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

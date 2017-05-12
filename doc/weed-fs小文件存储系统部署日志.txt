@@ -1,0 +1,100 @@
+2017-05-04
+
+参考资料：http://www.tuicool.com/articles/uuA7FvN
+          https://github.com/chrislusf/seaweedfs
+
+weed-fs ，全名Seaweed-fs，是一种用golang实现的简单且高可用的分布式文件系统。
+该系统的目标有二：
+- 存储billions of files
+- serve the files fast
+
+部署目标：搭建weed-fs文件服务集群，并测试
+
+
+
+1.下载seaweed-fs二进制执行文件
+https://github.com/chrislusf/seaweedfs/releases/latest
+
+截至到现在最新版本为0.75
+
+2.将二进制文件上传到服务器
+
+47.93.223.167 
+/home/web/soft/seaweed-fs
+
+3.规划weed-fs集群
+
+为了实验方便，我们定义了一个weed-fs集群拓扑：
+
+三个master:
+
+master1 – localhost:9333
+
+master2 – localhost:9334
+
+master3 – localhost:9335
+
+replication策略：100(即在另外一个不同的datacenter中复制一份)
+
+三个volume:
+
+volume1 – localhost:8081  dc1
+
+volume2 – localhost:8082  dc1
+
+volume3 – localhost:8083  dc2
+
+
+集群启动首先启动master们，启动顺序: master1、master2、master3：
+
+master1:
+$ ./weed -v=3 master -port=9333 -mdir=./m1 -peers=localhost:9333,localhost:9334,localhost:9335 -defaultReplication=100
+
+master2:
+$ ./weed -v=3 master -port=9334 -mdir=./m2 -peers=localhost:9333,localhost:9334,localhost:9335 -defaultReplication=100
+
+master3:
+$ ./weed -v=3 master -port=9335 -mdir=./m3 -peers=localhost:9333,localhost:9334,localhost:9335 -defaultReplication=100
+
+接下来我们来启动volume servers：
+volume1:
+$ ./weed -v=3 volume -port=8081 -dir=./v1 -mserver=localhost:9333 -dataCenter=dc1
+
+volume2:
+$ ./weed -v=3 volume -port=8082 -dir=./v2 -mserver=localhost:9334 -dataCenter=dc1
+
+volume3:
+$ ./weed -v=3 volume -port=8083 -dir=./v3 -mserver=localhost:9335 -dataCenter=dc2
+
+至此，整个weed-fs集群已经启动了。初始启动后的master会在-mdir下建立一些目录和文件：
+
+windows启动命令f
+master1:
+$ start /b weed.exe -v=3 master -port=9333 -mdir=./m1 -peers=localhost:9333,localhost:9334,localhost:9335 -defaultReplication=100
+
+master2:
+$ start /b weed.exe -v=3 master -port=9334 -mdir=./m2 -peers=localhost:9333,localhost:9334,localhost:9335 -defaultReplication=100
+
+master3:
+$ start /b weed.exe -v=3 master -port=9335 -mdir=./m3 -peers=localhost:9333,localhost:9334,localhost:9335 -defaultReplication=100
+
+接下来我们来启动volume servers：
+volume1:
+$ start /b weed.exe -v=3 volume -port=8081 -dir=./v1 -mserver=localhost:9333 -dataCenter=dc1
+
+volume2:
+$ start /b weed.exe -v=3 volume -port=8082 -dir=./v2 -mserver=localhost:9334 -dataCenter=dc1
+
+volume3:
+$ start /b weed.exe -v=3 volume -port=8083 -dir=./v3 -mserver=localhost:9335 -dataCenter=dc2
+
+
+
+
+
+AssignedWeedFSFile [weedFSFile=WeedFSFile [fid=1,0bdac101d6, version=0], location=Location [publicUrl=127.0.0.1:8081, url=127.0.0.1:8081], versionCount=1]
+
+AssignedWeedFSFile [weedFSFile=WeedFSFile [fid=1,0dc04747fa, version=0], location=Location [publicUrl=127.0.0.1:8081, url=127.0.0.1:8081], versionCount=1]
+size=78638
+
+
