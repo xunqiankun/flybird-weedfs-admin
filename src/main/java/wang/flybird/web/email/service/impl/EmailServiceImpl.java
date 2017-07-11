@@ -31,8 +31,8 @@ public class EmailServiceImpl implements EmailService {
     private EmailConfig emailConfig;  
     @Autowired  
     private JavaMailSender mailSender;  
-    @Autowired  
-    private VelocityEngine velocityEngine;  
+//    @Autowired  
+//    private VelocityEngine velocityEngine;  
       
     public void sendSimpleMail(String sendTo, String titel, String content) {  
         SimpleMailMessage message = new SimpleMailMessage();  
@@ -94,8 +94,8 @@ public class EmailServiceImpl implements EmailService {
             helper.setTo(sendTo);  
             helper.setSubject(titel);  
   
-            String text = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "template.vm", "UTF-8", content);  
-            helper.setText(text, true);  
+//            String text = VelocityEngineUtils.mergeTemplateIntoString(velocityEngine, "template.vm", "UTF-8", content);  
+//            helper.setText(text, true);  
               
             for (Pair<String, File> pair : attachments) {  
                 helper.addAttachment(pair.getLeft(), new FileSystemResource(pair.getRight()));  
